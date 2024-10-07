@@ -25,6 +25,10 @@
         <td>Email</td>
         <td>{{ user[4] }}</td>
     </tr>
+    <tr>
+            <td>Word Count</td>
+            <td>{{ user[5] }}</td>
+        </tr>
 </table>
-
+<a href="{{ url_for('download', username=user[0]) }}">Download file</a><br>
 <a href="{{ url_for('logout') }}">Logout</a>
