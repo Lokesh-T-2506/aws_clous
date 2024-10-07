@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 import os
 
@@ -17,25 +17,27 @@ conn.close()
 
 @app.route('/')
 def index():
-    return render_template('register.html')
+    return render_template('login.html')
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    username = request.form['username']
-    password = request.form['password']
-    firstname = request.form['firstname']
-    lastname = request.form['lastname']
-    email = request.form['email']
+    if request.method == 'POST':
+      username = request.form['username']
+      password = request.form['password']
+      firstname = request.form['firstname']
+      lastname = request.form['lastname']
+      email = request.form['email']
 
-    conn = sqlite3.connect(db_path)
-    c = conn.cursor()
-    c.execute("INSERT INTO users (username, password, firstname, lastname, email) VALUES (?, ?, ?, ?, ?)",
+      conn = sqlite3.connect(db_path)
+      c = conn.cursor()
+      c.execute("INSERT INTO users (username, password, firstname, lastname, email) VALUES (?, ?, ?, ?, ?)",
               (username, password, firstname, lastname, email))
-    conn.commit()
-    conn.close()
+      conn.commit()
+      conn.close()
     
-    session['username'] = username
-    return redirect(url_for('profile', username=username))
+      session['username'] = username
+      return redirect(url_for('profile', username=username))
+    return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -50,12 +52,13 @@ def login():
         conn.close()
 
         if user:
-            session['username'] = username
+            session['username'] = username  # Store username in session
             return redirect(url_for('profile', username=username))
         else:
+
             return "Invalid username or password. Please try again."
-    
     return render_template('login.html')
+
 
 
 @app.route('/profile/<username>')
